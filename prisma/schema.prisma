@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+datasource db {
+  provider = "mysql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// TABLA USUARIOS
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}
+
+// TABLA ESPECIES
+model Species {
+  id             Int         @id @default(autoincrement())
+  commonName     String      @map("common_name")
+  scientificName String?     @map("scientific_name")
+  group          String
+  imageUrl       String?     @map("image_url")
+  createdAt      DateTime    @default(now()) @map("created_at")
+
+  sightings      Sighting[]
+
+  @@map("species")
+}
+
+// TABLA AVISTAMIENTOS
+model Sighting {
+  id         Int      @id @default(autoincrement())
+  quantity   Int      @default(1)
+  latitude   Float
+  longitude  Float
+  observedAt DateTime @default(now()) @map("observed_at")
+  status     String   @default("vivo")
+  notes      String?  @db.Text
+  photoPath  String?  @map("photo_path")
+
+  species    Species @relation(fields: [speciesId], references: [id])
+  speciesId  Int     @map("species_id")
+
+  @@map("sightings")
+}
